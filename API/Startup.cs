@@ -1,3 +1,4 @@
+using Core.Interfaces;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -25,6 +26,7 @@ namespace API
             {
                 options.UseNpgsql(_configuration.GetConnectionString("DefaultConnection"));
             });
+            services.AddScoped<IProductRepository, ProductRepository>();
             services.AddControllers();
         }
 
