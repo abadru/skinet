@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace API
 {
@@ -29,9 +30,19 @@ namespace API
                 options.UseNpgsql(_configuration.GetConnectionString("DefaultConnection"));
             });
 
+            services.AddSingleton<IConnectionMultiplexer>(c =>
+            {
+                var configuration = ConfigurationOptions.Parse(_configuration.GetConnectionString("redis"), true);
+
+                return ConnectionMultiplexer.Connect(configuration);
+            });
+
             services.AddAutoMapper(typeof(MappingProfiles));
             
-            services.AddControllers();
+            services.AddControllers()
+                .AddNewtonsoftJson(options =>
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                );
 
             services.AddApplicationServices();
             
