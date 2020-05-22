@@ -3,6 +3,7 @@ using API.Helpers;
 using API.Middleware;
 using AutoMapper;
 using Infrastructure.Data;
+using Infrastructure.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,11 @@ namespace API
                 options.UseNpgsql(_configuration.GetConnectionString("DefaultConnection"));
             });
 
+            services.AddDbContext<AppIdentityContext>(options =>
+            {
+                options.UseNpgsql(_configuration.GetConnectionString("IdentityConnection"));
+            });
+
             services.AddSingleton<IConnectionMultiplexer>(c =>
             {
                 var configuration = ConfigurationOptions.Parse(_configuration.GetConnectionString("redis"), true);
@@ -45,6 +51,8 @@ namespace API
                 );
 
             services.AddApplicationServices();
+            
+            services.AddIdentityServices(_configuration);
             
             services.AddSwaggerDocumentation();
 
@@ -72,6 +80,8 @@ namespace API
             app.UseStaticFiles();
 
             app.UseCors("CorsPolicy");
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
