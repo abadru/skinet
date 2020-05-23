@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AccountService} from '../account/account.service';
 import {add} from 'ngx-bootstrap/chronos';
+import {Observable} from 'rxjs';
+import {IBasketTotals} from '../shared/models/basket';
+import {BasketService} from '../basket/basket.service';
 
 @Component({
   selector: 'app-checkout',
@@ -10,11 +13,15 @@ import {add} from 'ngx-bootstrap/chronos';
 })
 export class CheckoutComponent implements OnInit {
   checkoutForm: FormGroup;
-  constructor(private fb: FormBuilder, private accountService: AccountService) { }
+  basketTotals$: Observable<IBasketTotals>;
+  constructor(private fb: FormBuilder,
+              private accountService: AccountService,
+              private basketService: BasketService) { }
 
   ngOnInit(): void {
     this.createCheckOutForm();
     this.getAddressFormValues();
+    this.basketTotals$ = this.basketService.basketTotal$;
   }
 
   createCheckOutForm() {
